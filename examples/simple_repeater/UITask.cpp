@@ -375,6 +375,13 @@ void UITask::loop() {
   } else if (ev == BUTTON_EVENT_LONG_PRESS) {
       _display->turnOn();
       Serial.println("Powering Off");
+      ESP_LOGE("POWER", "Shutdown requested from: %s", __func__);
+      ESP_LOGE("POWER", "Free heap: %lu",
+               (unsigned long)ESP.getFreeHeap());
+      // ESP_LOGE is compiled out at the default CORE_DEBUG_LEVEL=0, so mirror to Serial.
+      Serial.printf("POWER: Shutdown requested from: %s (user button long press, pin %d level=%d, uptime=%lus)\n",
+                    __func__, (int)user_btn.getPin(), digitalRead(user_btn.getPin()), millis() / 1000);
+      Serial.printf("POWER: Free heap: %lu\n", (unsigned long)ESP.getFreeHeap());
       _powering_off_at = millis() + POWEROFF_DELAY; 
   }
 #endif
@@ -458,6 +465,12 @@ void UITask::loop() {
     digitalWrite(LED_PIN, !LED_STATE_ON); // off LED
 #endif
     if (millis() > _powering_off_at) {
+      ESP_LOGE("POWER", "Shutdown requested from: %s", __func__);
+      ESP_LOGE("POWER", "Free heap: %lu",
+               (unsigned long)ESP.getFreeHeap());
+      Serial.printf("POWER: Calling board powerOff() from: %s, free heap: %lu\n",
+                    __func__, (unsigned long)ESP.getFreeHeap());
+      Serial.flush();
       _board->powerOff();  // should not return
     }
   }
