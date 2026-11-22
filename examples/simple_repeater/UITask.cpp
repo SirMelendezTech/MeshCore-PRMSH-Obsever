@@ -355,6 +355,16 @@ void UITask::toggleDisplay(const char* source) {
 void UITask::loop() {
 #if defined(PIN_USER_BTN) && defined(DISPLAY_CLASS)
   int ev = user_btn.check();
+  if (!_btn_released_since_boot && !user_btn.isPressed()) {
+    _btn_released_since_boot = true;
+  }
+  if (ev == BUTTON_EVENT_LONG_PRESS && !_btn_released_since_boot) {
+    // Button was already held when the board powered on (e.g. the press used to
+    // turn it on, or the case pressing it): don't treat that as a power-off request.
+    Serial.printf("POWER: Ignoring long press held since boot (pin %d level=%d, uptime=%lus)\n",
+                  (int)user_btn.getPin(), digitalRead(user_btn.getPin()), millis() / 1000);
+    ev = BUTTON_EVENT_NONE;
+  }
   if (ev == BUTTON_EVENT_CLICK) {
 #ifdef DISPLAY_TOUCH_TOGGLE
     toggleDisplay("button");   // same action as tapping the panel
