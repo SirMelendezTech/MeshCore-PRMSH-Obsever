@@ -18,7 +18,9 @@ SensorManager sensors;
 
 #ifdef DISPLAY_CLASS
   DISPLAY_CLASS display;
-  MomentaryButton user_btn(PIN_USER_BTN, 1000, true);
+  // Active-low button: enable the internal pull-up so a floating/noisy GPIO47
+  // (e.g. during WiFi TX current spikes) is not read as a 1 s long press -> power off.
+  MomentaryButton user_btn(PIN_USER_BTN, 1000, true, true);
 #endif
 
 bool radio_init() {
