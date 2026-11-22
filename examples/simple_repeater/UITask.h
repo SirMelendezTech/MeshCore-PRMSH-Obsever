@@ -24,6 +24,7 @@ class UITask {
   NodePrefs* _node_prefs;
   char _version_info[32];
   unsigned long _powering_off_at = 0;
+  bool _btn_released_since_boot = false;  // ignore a long press still held from power-on
   unsigned long _started_at = 0;
 
 #ifdef DISPLAY_REDRAW_ON_CHANGE
