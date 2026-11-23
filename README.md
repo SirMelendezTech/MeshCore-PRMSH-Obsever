@@ -1,3 +1,42 @@
+## PRMSH Observer (ThinkNode M2)
+
+Fork de [agessaman/MeshCore](https://github.com/agessaman/MeshCore) (`observer-firmware-dev`) con soporte de observer MQTT para la Elecrow ThinkNode M2.
+
+### Compilar y flashear
+
+```bash
+pio run -e ThinkNode_M2_repeater_observer_mqtt -t mergebin
+```
+
+- Primer flasheo / después de un erase: `.pio/build/ThinkNode_M2_repeater_observer_mqtt/firmware-merged.bin` en `0x0`, con erase (la tabla de particiones es `min_spiffs.csv`).
+- Updates OTA: `.pio/build/ThinkNode_M2_repeater_observer_mqtt/firmware.bin`.
+
+### Configuración MQTT para CoreScope (corescope.prmsh.com)
+
+Slot 1 = CoreScope con usuario/contraseña (sin JWT). Slot 2 = `none`. Ejecutar en la consola serial:
+
+```
+set wifi.ssid <tu_ssid>
+set wifi.pwd <tu_clave_wifi>
+
+set mqtt1.preset custom
+set mqtt1.server wss://corescope.prmsh.com:443/mqtt
+set mqtt1.audience
+set mqtt1.username <usuario>
+set mqtt1.password <clave>
+
+set mqtt2.preset none
+
+set mqtt.iata SJU
+set mqtt.neighbors on
+reboot
+```
+
+- `set mqtt1.audience` sin valor desactiva el JWT y usa usuario/contraseña. El broker rechaza JWT (`return code=5`).
+- Pide el usuario/contraseña MQTT al admin de PRMSH o solicita un login personal en `https://corescope.prmsh.com/#/account?section=observers`.
+- Después de un erase el firmware vuelve a los defaults (`mqtt1` = `analyzer-us`, `mqtt2` = `analyzer-eu`), así que hay que repetir estos comandos.
+- Verifica con `get mqtt.stats` o busca `MQTT1 connected` en el log.
+
 ## About MeshCore
 
 MeshCore is a lightweight, portable C++ library that enables multi-hop packet routing for embedded projects using LoRa and other packet radios. It is designed for developers who want to create resilient, decentralized communication networks that work without the internet.
